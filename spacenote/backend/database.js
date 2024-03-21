@@ -16,4 +16,8 @@ db.run('CREATE TABLE IF NOT EXISTS spaces(id INTEGER PRIMARY KEY AUTOINCREMENT, 
   console.log('Table created or already exists.');
 });
 
+
+
+
+
 module.exports = db;

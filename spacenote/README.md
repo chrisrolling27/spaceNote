@@ -46,4 +46,11 @@ your space may live for a few days, I dont know. you may be able to edit, but yo
 
 maybe a protected space option too 
 
+todo:
+express needs to be creating the space name. 
+the space name gets shown to user on homescreen
+the user then clicks the spacename and goes to it
+the user has to edit the page with something. this save action is what actually saves the space in the db! 
+
+
 
