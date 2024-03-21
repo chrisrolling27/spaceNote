@@ -34,3 +34,16 @@ You can check out [the Next.js GitHub repository](https://github.com/vercel/next
 The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
 
 Check out our [Next.js deployment documentation](https://nextjs.org/docs/deployment) for more details.
+
+todo:
+space note - general instruction at spacenote.domain
+spacenote.domain.red_lion_salad where you can post something
+SQL
+need to figure out routing and the construction of space 
+the homepage will take you to a space. that basically becomes yours. lives for a while...i dont know. everything just writes to a database.
+
+your space may live for a few days, I dont know. you may be able to edit, but you can definitely post to this thing 
+
+maybe a protected space option too 
+
+
