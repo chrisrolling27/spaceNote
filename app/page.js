@@ -5,21 +5,25 @@ import React, { useState } from "react";
 export default function Home() {
   const [note, setNote] = useState("");
 
-  const generateRandomWord = () => {
-    const selectRandom = (array) =>
-      array[Math.floor(Math.random() * array.length)];
-
-    const randomAnimal = selectRandom(animals);
-    const randomColor = selectRandom(colors);
-    const randomFood = selectRandom(foods);
-
-    return `${randomColor}${randomAnimal}${randomFood}`;
+  // Updated function to fetch word from server
+  const fetchRandomWord = async () => {
+    try {
+      const response = await fetch("http://localhost:8080/spaces");
+      if (!response.ok) {
+        throw new Error(`Error: ${response.statusText}`);
+      }
+      const word = await response.text();
+      setNote(word);
+    } catch (error) {
+      console.error("Failed to fetch random word:", error);
+      setNote("Failed to fetch data. Check console for details.");
+    }
   };
 
   // Function to handle button click
   const handleClick = () => {
-    const randomString = generateRandomWord();
-    setNote(randomString);
+    console.log('handleclick');
+    fetchRandomWord();
   };
 
   return (
