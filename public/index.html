@@ -1,1 +1,33 @@
-<div> hello world ! </div>
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SpaceNote</title>
+</head>
+<body>
+    <h1>Welcome to Space Note</h1>
+    <p>Create your own space and come back later.</p>
+    <button onclick="createSpace()">Create New Space</button>
+    <div id="space-link"></div>
+
+    <script>
+        function createSpace() {
+            // Generate a random string for the space ID
+            const spaceId = Math.random().toString(36).substr(2, 9);
+            const link = document.createElement('a');
+            const url = window.location.href + 'space/' + spaceId;
+
+            link.href = url;
+            link.textContent = "Go to your new space";
+            link.style.display = "block";
+            link.style.marginTop = "20px";
+
+            // Clear any previous link and display the new one
+            const container = document.getElementById('space-link');
+            container.innerHTML = '';
+            container.appendChild(link);
+        }
+    </script>
+</body>
+</html>
