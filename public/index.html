@@ -1,33 +1,55 @@
 <!DOCTYPE html>
 <html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>SpaceNote</title>
-</head>
-<body>
+    <link rel="stylesheet" href="styles.css" />
+  </head>
+  <body>
     <h1>Welcome to Space Note</h1>
     <p>Create your own space and come back later.</p>
-    <button onclick="createSpace()">Create New Space</button>
+    <button onclick="handleCreateSpace()">Create New Space</button>
     <div id="space-link"></div>
 
     <script>
-        function createSpace() {
-            // Generate a random string for the space ID
-            const spaceId = Math.random().toString(36).substr(2, 9);
-            const link = document.createElement('a');
-            const url = window.location.href + 'space/' + spaceId;
+      function handleCreateSpace() {
+        const spaceObject = createSpaceObject();
+        displaySpaceLink(spaceObject);
+      }
 
-            link.href = url;
-            link.textContent = "Go to your new space";
-            link.style.display = "block";
-            link.style.marginTop = "20px";
+      function createSpaceObject() {
+        const spaceId = Math.random().toString(36).substr(2, 9);
+        const url = `${window.location.href}space/${spaceId}`;
+        return { spaceId: spaceId, url: url };
+      }
 
-            // Clear any previous link and display the new one
-            const container = document.getElementById('space-link');
-            container.innerHTML = '';
-            container.appendChild(link);
-        }
+      function displaySpaceLink(spaceObject) {
+        const link = document.createElement("a");
+        link.href = spaceObject.url;
+        link.textContent = "Go to your new space";
+        link.style.display = "block";
+        link.style.marginTop = "20px";
+
+        link.addEventListener("click", function (event) {
+          event.preventDefault(); // Prevent the default link behavior
+          notifyBackend(spaceObject.spaceId);
+        });
+
+        const container = document.getElementById("space-link");
+        container.innerHTML = "";
+        container.appendChild(link);
+      }
+
+      function notifyBackend(spaceId) {
+        fetch(`/clicked?spaceName=${spaceId}`)
+          .then((response) => response.json())
+          .then((data) => {
+            console.log(data);
+          })
+          .then((data) => console.log("Success:", data))
+          .catch((error) => console.error("Error:", error));
+      }
     </script>
-</body>
+  </body>
 </html>
