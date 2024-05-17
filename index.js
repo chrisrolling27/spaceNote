@@ -32,7 +32,7 @@ app.get("/space/:spaceId", (req, res) => {
     // Example data - you might replace this with actual data fetching logic later
     const data = {
       spaceId: spaceId,
-      content: "This is your new space. Start adding content here!"
+      content: "This is your old saved content"
     };
   
     // Render a Handlebars template (assuming you have a 'space.handlebars' template)
