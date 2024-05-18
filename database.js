@@ -11,58 +11,88 @@ const db = new sqlite3.Database(dbPath, (err) => {
   }
 });
 
-// Define the categories and generate space names
+// Define the categories and generate space objects
 const adjectives = ["spicy", "snarky", "shrewd"];
-const colors = ["red", "green", "blue"];
 const nouns = ["fox", "monk", "peach"];
-const spacenames = [];
-adjectives.forEach(adjective => {
-  colors.forEach(color => {
-    nouns.forEach(noun => {
-      spacenames.push(`${adjective} ${color} ${noun}`);
+const spaces = [];
+
+const username = "admin";
+const createdAt = new Date().toISOString();
+
+adjectives.forEach((adjective) => {
+  nouns.forEach((noun) => {
+    spaces.push({
+      space_name: `${adjective} ${noun}`,
+      created_by: username,
+      created_date: createdAt,
     });
   });
 });
 
-// Serialize database operations
+// Writes spaces table in database with example data if it doesn't exist
 db.serialize(() => {
-  // Create the spaces table if it doesn't exist
-  db.run(`CREATE TABLE IF NOT EXISTS spaces (
-    id INTEGER PRIMARY KEY AUTOINCREMENT,
-    space_name TEXT UNIQUE,
-    username TEXT,
-    created_at TEXT
-  )`, (err) => {
-    if (err) {
-      console.error("Error creating spaces table:", err.message);
-    } else {
-      console.log("Spaces table is ready.");
-    }
-  });
-
-  // Prepare the insert statement for spaces
-  const stmt = db.prepare(`INSERT INTO spaces (space_name, username, created_at) VALUES (?, ?, ?)`);
-  const username = 'admin';
-  const createdAt = new Date().toISOString();
-
-  spacenames.forEach(space => {
-    stmt.run(space, username, createdAt, (err) => {
+  // Check if the spaces table exists
+  db.get(
+    "SELECT name FROM sqlite_master WHERE type='table' AND name='spaces'",
+    (err, row) => {
       if (err) {
-        console.error(`Error inserting ${space}:`, err.message);
-      } else {
-        console.log(`Inserted space: ${space}`);
+        console.error("Error checking for spaces table:", err.message);
+        return;
       }
-    });
-  });
+      if (row) {
+        //console.log(row);
+      } else {
+        // Create the spaces table
+        db.run(
+          `CREATE TABLE spaces (
+        id INTEGER PRIMARY KEY AUTOINCREMENT,
+        space_name TEXT UNIQUE,
+        created_by TEXT,
+        created_date TEXT
+      )`,
+          (err) => {
+            if (err) {
+              console.error("Error creating spaces table:", err.message);
+              return;
+            }
+            console.log("Spaces table is ready.");
 
-  // Finalize the statement
-  stmt.finalize((err) => {
-    if (err) {
-      console.error("Error finalizing statement:", err.message);
-    } else {
-      console.log("All spaces have been inserted.");
+            // Prepare the insert statement for spaces
+            const stmt = db.prepare(
+              `INSERT INTO spaces (space_name, created_by, created_date) VALUES (?, ?, ?)`
+            );
+
+            spaces.forEach((space) => {
+              stmt.run(
+                space.space_name,
+                space.created_by,
+                space.created_date,
+                (err) => {
+                  if (err) {
+                    console.error(
+                      `Error inserting ${space.space_name}:`,
+                      err.message
+                    );
+                  } else {
+                    console.log(`Inserted space: ${space.space_name}`);
+                  }
+                }
+              );
+            });
+
+            // Finalize the statement to clean up resources
+            stmt.finalize((err) => {
+              if (err) {
+                console.error("Error finalizing statement:", err.message);
+              } else {
+                console.log("All spaces have been inserted.");
+              }
+            });
+          }
+        );
+      }
     }
-  });
+  );
 });
 
 module.exports = db;
