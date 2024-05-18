@@ -18,4 +18,18 @@ the user has to edit the page with something. this save action is what actually 
 
 
 
+have 9 spaces to start in backend 
+frontend button gets random space link
+you go to the space or can remember your space 
+
+writes reads to database 
+
+
+
+I dont see why space creation should even be an api route, just a database entries
+
+get random route which returns space name and url object 
+particular space needs to post route 
+
+
 
