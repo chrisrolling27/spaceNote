@@ -29,67 +29,62 @@ adjectives.forEach((adjective) => {
   });
 });
 
-// Writes spaces table in database with example data if it doesn't exist
 db.serialize(() => {
-  // Check if the spaces table exists
-  db.get(
-    "SELECT name FROM sqlite_master WHERE type='table' AND name='spaces'",
-    (err, row) => {
+  // Create the spaces table if it doesn't exist
+  db.run(
+    `CREATE TABLE IF NOT EXISTS spaces (
+      id INTEGER PRIMARY KEY AUTOINCREMENT,
+      space_name TEXT UNIQUE,
+      created_by TEXT,
+      created_date TEXT
+    )`,
+    (err) => {
       if (err) {
-        console.error("Error checking for spaces table:", err.message);
-        return;
-      }
-      if (row) {
-        //console.log(row);
+        console.error("Error creating spaces table:", err.message);
       } else {
-        // Create the spaces table
-        db.run(
-          `CREATE TABLE spaces (
-        id INTEGER PRIMARY KEY AUTOINCREMENT,
-        space_name TEXT UNIQUE,
-        created_by TEXT,
-        created_date TEXT
-      )`,
-          (err) => {
-            if (err) {
-              console.error("Error creating spaces table:", err.message);
-              return;
-            }
-            console.log("Spaces table is ready.");
+        console.log("Spaces table is ready.");
 
-            // Prepare the insert statement for spaces
-            const stmt = db.prepare(
-              `INSERT INTO spaces (space_name, created_by, created_date) VALUES (?, ?, ?)`
-            );
-
-            spaces.forEach((space) => {
-              stmt.run(
-                space.space_name,
-                space.created_by,
-                space.created_date,
-                (err) => {
-                  if (err) {
-                    console.error(
-                      `Error inserting ${space.space_name}:`,
-                      err.message
-                    );
-                  } else {
-                    console.log(`Inserted space: ${space.space_name}`);
-                  }
-                }
-              );
-            });
-
-            // Finalize the statement to clean up resources
-            stmt.finalize((err) => {
-              if (err) {
-                console.error("Error finalizing statement:", err.message);
-              } else {
-                console.log("All spaces have been inserted.");
-              }
-            });
-          }
+        // Prepare the insert statement for spaces
+        const stmt = db.prepare(
+          `INSERT INTO spaces (space_name, created_by, created_date) VALUES (?, ?, ?)`
         );
+
+        spaces.forEach((space) => {
+          stmt.run(space.space_name, space.created_by, space.created_date, (err) => {
+            if (err) {
+              console.error(`Error inserting ${space.space_name}:`, err.message);
+            } else {
+              console.log(`Inserted space: ${space.space_name}`);
+            }
+          });
+        });
+
+        stmt.finalize((err) => {
+          if (err) {
+            console.error("Error finalizing statement:", err.message);
+          } else {
+            console.log("All spaces have been inserted.");
+          }
+        });
+      }
+    }
+  );
+
+  // Create the posts table if it doesn't exist
+  db.run(
+    `CREATE TABLE IF NOT EXISTS posts (
+      id INTEGER PRIMARY KEY AUTOINCREMENT,
+      space_id INTEGER,
+      content TEXT,
+      created_by TEXT,
+      created_date TEXT,
+      FOREIGN KEY (space_id) REFERENCES spaces(id)
+    )`,
+    (err) => {
+      if (err) {
+        console.error("Error creating posts table:", err.message);
+      } else {
+        console.log("Posts table is ready.");
       }
     }
   );
