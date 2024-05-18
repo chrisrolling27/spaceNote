@@ -2,7 +2,7 @@ const express = require("express");
 const path = require("path");
 const sqlite3 = require("sqlite3").verbose();
 const { engine } = require("express-handlebars");
-const db = require("./database");
+const db = require("./db/database.js");
 
 const app = express();
 const PORT = 3000;
