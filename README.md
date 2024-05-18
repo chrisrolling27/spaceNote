@@ -32,4 +32,5 @@ get random route which returns space name and url object
 particular space needs to post route 
 
 
+handle no empty spaces 
 

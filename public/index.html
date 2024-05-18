@@ -9,58 +9,36 @@
   <body>
     <h1>Welcome to Space Note</h1>
     <p>Create your own space and come back later.</p>
-    <button id="create-space-button" onclick="handleCreateSpace()">Get empty space</button>
+    <button id="create-space-button" onclick="handleCreateSpace()">
+      Get space
+    </button>
     <div id="space-link"></div>
 
     <script>
-      function handleCreateSpace() {
-        const button = document.getElementById("create-space-button");
-        button.disabled = true;
-
-        const spaceObject = createSpaceObject();
-        displaySpaceLink(spaceObject);
-      }
-
-      function createSpaceObject() {
-        const spaceId = Math.random().toString(36).substr(2, 9);
-        const url = `${window.location.origin}/space/${spaceId}`;
-        return { spaceId: spaceId, url: url };
+      async function handleCreateSpace() {
+        try {
+          const response = await fetch("/randomspace");
+          const data = await response.json();
+          if (response.ok) {
+            displaySpaceLink(data.data);
+          } else {
+            console.error(data.error);
+          }
+        } catch (error) {
+          console.error("Error fetching random space:", error);
+        }
       }
 
       function displaySpaceLink(spaceObject) {
         const link = document.createElement("a");
-        link.href = spaceObject.url;
+        link.href = `/space/${spaceObject.spaces_id}`;
         link.textContent = "Go to your new space";
         link.style.display = "block";
         link.style.marginTop = "20px";
 
-        link.addEventListener("click", function (event) {
-          event.preventDefault(); // Prevent default link behavior
-          createSpace(spaceObject.spaceId).then(() => {
-            window.location.href = spaceObject.url; // Redirect after space is created
-          });
-        });
-
         const container = document.getElementById("space-link");
         container.innerHTML = "";
         container.appendChild(link);
-      }
-
-      function createSpace(spaceId) {
-        return fetch("/clicked", {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-          },
-          body: JSON.stringify({ spaceName: spaceId }),
-        })
-        .then((response) => response.json())
-        .then((data) => {
-          console.log("Success:", data);
-        })
-        .catch((error) => {
-          console.error("Error:", error);
-        });
       }
     </script>
   </body>
