@@ -1,16 +1,53 @@
+<!DOCTYPE html>
 <html lang="en">
-  <head>
+<head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>{{title}}</title>
+    <title>{{space_name}}</title>
     <link rel="stylesheet" type="text/css" href="/styles.css" />
-  </head>
-  <body>
-    <h1>welcome to the {{space_name}} space!</h1>
+</head>
+<body>
+    <h1>Welcome to {{space_name}}</h1>
     <form id="spaceForm">
-      <textarea id="longText" name="longText" rows="10" cols="50"></textarea><br
-      />
-      <button type="submit">Post</button>
+        <textarea id="longText" name="longText" rows="10" cols="50"></textarea><br />
+        <button type="submit">Post</button>
     </form>
-  </body>
+
+    <div id="threadsContainer">
+        <!-- Threads will be loaded here -->
+    </div>
+
+    <script>
+        document.addEventListener("DOMContentLoaded", function() {
+            const spaceName = "{{space_name}}";
+
+            fetch(`/${spaceName}/threads`)
+                .then(response => response.json())
+                .then(data => {
+                    const threadsContainer = document.getElementById("threadsContainer");
+                    if (data.threads.length === 0) {
+                        threadsContainer.innerHTML = "<p>No threads available.</p>";
+                    } else {
+                        data.threads.forEach(thread => {
+                            const threadElement = document.createElement("div");
+                            threadElement.classList.add("thread");
+                            threadElement.innerHTML = `
+                                <h2>Thread: ${thread.thread_title}</h2>
+                                <div>
+                                    ${data.posts
+                                        .filter(post => post.thread_id === thread.thread_id)
+                                        .map(post => `<p>${post.content}</p>`)
+                                        .join('')}
+                                </div>
+                            `;
+                            threadsContainer.appendChild(threadElement);
+                        });
+                    }
+                })
+                .catch(error => {
+                    console.error("Error fetching threads:", error);
+                });
+        });
+    </script>
+</body>
 </html>

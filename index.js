@@ -22,39 +22,33 @@ app.set("views", path.join(__dirname, "views"));
 
 // Serves main page
 app.get("/", (req, res) => {
-  res.render("main", {
-    title: "Home",
-    content:
-      "<h1>Welcome to the Home Page</h1><p>This is the main content of the home page.</p>",
-  });
+  res.render();
 });
-
-// Function to get a random space
-async function getRandomSpace() {
-  return new Promise((resolve, reject) => {
-    db.all(
-      "SELECT space_id, space_name, created_at FROM Spaces",
-      [],
-      (err, rows) => {
-        if (err) {
-          return reject(err);
-        }
-        if (rows.length === 0) {
-          return reject(new Error("No spaces found"));
-        }
-        const randomIndex = Math.floor(Math.random() * rows.length);
-        const randomSpace = rows[randomIndex];
-        resolve(randomSpace);
-      }
-    );
-  });
-}
 
 // Fetch and display a random space
 app.get("/randomspace", async (req, res) => {
+  
+  async function getRandomSpace() {
+    return new Promise((resolve, reject) => {
+      db.all(
+        "SELECT space_id, space_name, created_at FROM Spaces",
+        [],
+        (err, rows) => {
+          if (err) {
+            return reject(err);
+          }
+          if (rows.length === 0) {
+            return reject(new Error("No spaces found"));
+          }
+          const randomIndex = Math.floor(Math.random() * rows.length);
+          const randomSpace = rows[randomIndex];
+          resolve(randomSpace);
+        }
+      );
+    });
+  }
   try {
     const space = await getRandomSpace();
-    const sanitizedSpaceName = space.space_name.replace(/\s+/g, "-"); // Replace spaces with hyphens
     res.json({
       message: "success",
       data: {
@@ -70,7 +64,7 @@ app.get("/randomspace", async (req, res) => {
 
 // Route to go to the requested random space directly
 app.get("/:space_name", (req, res) => {
-  const spaceName = req.params.space_name.replace(/-/g, " "); // Replace hyphens with spaces
+  const spaceName = req.params.space_name;
   db.get(
     "SELECT * FROM Spaces WHERE space_name = ?",
     [spaceName],
@@ -84,7 +78,7 @@ app.get("/:space_name", (req, res) => {
       res.render("main", {
         space_name: row.space_name,
         space_id: row.space_id,
-        created_at: row.created_at
+        created_at: row.created_at,
       });
     }
   );
@@ -92,7 +86,7 @@ app.get("/:space_name", (req, res) => {
 
 // Route to fetch threads and posts
 app.get("/:space_name/threads", (req, res) => {
-  const spaceName = req.params.space_name.replace(/-/g, " ");
+  const spaceName = req.params.space_name;
   db.get(
     "SELECT space_id FROM Spaces WHERE space_name = ?",
     [spaceName],
