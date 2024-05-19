@@ -8,3 +8,12 @@ body {
 #space-link {
     margin-top: 20px;
 }
+
+#space-link a {
+    color: green; /* Change this to your desired color */
+    text-decoration: none;
+}
+
+#space-link a:hover {
+    text-decoration: underline;
+}

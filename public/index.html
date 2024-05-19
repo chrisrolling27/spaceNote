@@ -31,8 +31,8 @@
 
       function displaySpaceLink(spaceObject) {
         const link = document.createElement("a");
-        link.href = `/space/${spaceObject.spaces_id}`;
-        link.textContent = "Go to your new space";
+        link.href = `/space/${spaceObject.space_name}`;
+        link.innerHTML = `<strong>${spaceObject.space_name}</strong> <small>created ${spaceObject.created_at}</small>`;
         link.style.display = "block";
         link.style.marginTop = "20px";
 

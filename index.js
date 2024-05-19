@@ -56,8 +56,8 @@ app.get("/randomspace", async (req, res) => {
     res.json({
       message: "success",
       data: {
-        space_name: space.space_name,
         space_id: space.space_id,
+        space_name: space.space_name,
         created_at: space.created_at,
       },
     });
