@@ -65,3 +65,21 @@ app.get("/randomspace", async (req, res) => {
     res.status(500).json({ error: err.message });
   }
 });
+
+// Route to go to the requested random space
+app.get("/space/:space_name", (req, res) => {
+  const spaceName = req.params.space_name;
+  db.get("SELECT * FROM Spaces WHERE space_name = ?", [spaceName], (err, row) => {
+    if (err) {
+      return res.status(500).json({ error: err.message });
+    }
+    if (!row) {
+      return res.status(404).json({ error: "Space not found" });
+    }
+    res.render("space", {
+      space_id: row.space_id,
+      space_name: row.space_name,
+      created_at: row.created_at,
+    });
+  });
+});
