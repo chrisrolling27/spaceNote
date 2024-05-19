@@ -25,27 +25,21 @@ app.get("/", (req, res) => {
 // Function to get a random space
 async function getRandomSpace() {
   return new Promise((resolve, reject) => {
-    db.all("SELECT space_id FROM Spaces", [], (err, rows) => {
-      if (err) {
-        return reject(err);
-      }
-      if (rows.length === 0) {
-        return reject(new Error("No spaces found"));
-      }
-      const randomIndex = Math.floor(Math.random() * rows.length);
-      const randomSpaceId = rows[randomIndex].space_id;
-
-      db.get(
-        "SELECT * FROM Spaces WHERE space_id = ?",
-        [randomSpaceId],
-        (err, row) => {
-          if (err) {
-            return reject(err);
-          }
-          resolve(row);
+    db.all(
+      "SELECT space_id, space_name, created_at FROM Spaces",
+      [],
+      (err, rows) => {
+        if (err) {
+          return reject(err);
         }
-      );
-    });
+        if (rows.length === 0) {
+          return reject(new Error("No spaces found"));
+        }
+        const randomIndex = Math.floor(Math.random() * rows.length);
+        const randomSpace = rows[randomIndex];
+        resolve(randomSpace);
+      }
+    );
   });
 }
 
@@ -66,20 +60,24 @@ app.get("/randomspace", async (req, res) => {
   }
 });
 
-// Route to go to the requested random space
-app.get("/space/:space_name", (req, res) => {
+// Route to go to the requested random space directly
+app.get("/:space_name", (req, res) => {
   const spaceName = req.params.space_name;
-  db.get("SELECT * FROM Spaces WHERE space_name = ?", [spaceName], (err, row) => {
-    if (err) {
-      return res.status(500).json({ error: err.message });
+  db.get(
+    "SELECT * FROM Spaces WHERE space_name = ?",
+    [spaceName],
+    (err, row) => {
+      if (err) {
+        return res.status(500).json({ error: err.message });
+      }
+      if (!row) {
+        return res.status(404).json({ error: "Space not found" });
+      }
+      res.render("space", {
+        space_id: row.space_id,
+        space_name: row.space_name,
+        created_at: row.created_at,
+      });
     }
-    if (!row) {
-      return res.status(404).json({ error: "Space not found" });
-    }
-    res.render("space", {
-      space_id: row.space_id,
-      space_name: row.space_name,
-      created_at: row.created_at,
-    });
-  });
+  );
 });

@@ -1,11 +1,11 @@
-INSERT INTO Spaces (space_name) VALUES ('spicy fox');
-INSERT INTO Spaces (space_name) VALUES ('spicy monk');
-INSERT INTO Spaces (space_name) VALUES ('spicy peach');
+INSERT INTO Spaces (space_name) VALUES ('spicyfox');
+INSERT INTO Spaces (space_name) VALUES ('spicymonk');
+INSERT INTO Spaces (space_name) VALUES ('spicypeach');
 
-INSERT INTO Spaces (space_name) VALUES ('snarky fox');
-INSERT INTO Spaces (space_name) VALUES ('snarky monk');
-INSERT INTO Spaces (space_name) VALUES ('snarky peach');
+INSERT INTO Spaces (space_name) VALUES ('snarkyfox');
+INSERT INTO Spaces (space_name) VALUES ('snarkymonk');
+INSERT INTO Spaces (space_name) VALUES ('snarkypeach');
 
-INSERT INTO Spaces (space_name) VALUES ('shrewd fox');
-INSERT INTO Spaces (space_name) VALUES ('shrewd monk');
-INSERT INTO Spaces (space_name) VALUES ('shrewd peach');
+INSERT INTO Spaces (space_name) VALUES ('shrewdfox');
+INSERT INTO Spaces (space_name) VALUES ('shrewdmonk');
+INSERT INTO Spaces (space_name) VALUES ('shrewdpeach');
