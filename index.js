@@ -13,13 +13,20 @@ app.listen(PORT, () => {
 app.use(express.static("public"));
 app.use(express.json());
 
-app.engine("hbs", engine({ extname: '.hbs', defaultLayout: "main", layoutsDir: path.join(__dirname, "views/layouts") }));
+app.engine(
+  "hbs",
+  engine({ extname: ".hbs", layoutsDir: path.join(__dirname, "views") })
+);
 app.set("view engine", "hbs");
 app.set("views", path.join(__dirname, "views"));
 
-// Serves mainpage
+// Serves main page
 app.get("/", (req, res) => {
-  res.render("main", { title: "Home" });
+  res.render("main", {
+    title: "Home",
+    content:
+      "<h1>Welcome to the Home Page</h1><p>This is the main content of the home page.</p>",
+  });
 });
 
 // Function to get a random space
@@ -75,14 +82,15 @@ app.get("/:space_name", (req, res) => {
         return res.status(404).json({ error: "Space not found" });
       }
       res.render("main", {
-        space_id: row.space_id,
         space_name: row.space_name,
-        created_at: row.created_at,
+        space_id: row.space_id,
+        created_at: row.created_at
       });
     }
   );
 });
 
+// Route to fetch threads and posts
 app.get("/:space_name/threads", (req, res) => {
   const spaceName = req.params.space_name.replace(/-/g, " ");
   db.get(
