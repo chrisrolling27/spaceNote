@@ -13,13 +13,13 @@ app.listen(PORT, () => {
 app.use(express.static("public"));
 app.use(express.json());
 
-app.engine("handlebars", engine());
-app.set("view engine", "handlebars");
+app.engine("hbs", engine({ extname: '.hbs', defaultLayout: "main", layoutsDir: path.join(__dirname, "views/layouts") }));
+app.set("view engine", "hbs");
 app.set("views", path.join(__dirname, "views"));
 
 // Serves mainpage
 app.get("/", (req, res) => {
-  res.sendFile(path.join(__dirname, "public", "index.html"));
+  res.render("main", { title: "Home" });
 });
 
 // Function to get a random space
@@ -47,11 +47,12 @@ async function getRandomSpace() {
 app.get("/randomspace", async (req, res) => {
   try {
     const space = await getRandomSpace();
+    const sanitizedSpaceName = space.space_name.replace(/\s+/g, "-"); // Replace spaces with hyphens
     res.json({
       message: "success",
       data: {
         space_id: space.space_id,
-        space_name: space.space_name,
+        space_name: sanitizedSpaceName,
         created_at: space.created_at,
       },
     });
@@ -62,7 +63,7 @@ app.get("/randomspace", async (req, res) => {
 
 // Route to go to the requested random space directly
 app.get("/:space_name", (req, res) => {
-  const spaceName = req.params.space_name;
+  const spaceName = req.params.space_name.replace(/-/g, " "); // Replace hyphens with spaces
   db.get(
     "SELECT * FROM Spaces WHERE space_name = ?",
     [spaceName],
@@ -73,11 +74,56 @@ app.get("/:space_name", (req, res) => {
       if (!row) {
         return res.status(404).json({ error: "Space not found" });
       }
-      res.render("space", {
+      res.render("main", {
         space_id: row.space_id,
         space_name: row.space_name,
         created_at: row.created_at,
       });
+    }
+  );
+});
+
+app.get("/:space_name/threads", (req, res) => {
+  const spaceName = req.params.space_name.replace(/-/g, " ");
+  db.get(
+    "SELECT space_id FROM Spaces WHERE space_name = ?",
+    [spaceName],
+    (err, space) => {
+      if (err) {
+        return res.status(500).json({ error: err.message });
+      }
+      if (!space) {
+        return res.status(404).json({ error: "Space not found" });
+      }
+
+      const spaceId = space.space_id;
+      db.all(
+        "SELECT * FROM Threads WHERE space_id = ?",
+        [spaceId],
+        (err, threads) => {
+          if (err) {
+            return res.status(500).json({ error: err.message });
+          }
+
+          const threadIds = threads.map((thread) => thread.thread_id);
+          if (threadIds.length === 0) {
+            return res.json({ threads: [], posts: [] });
+          }
+
+          db.all(
+            "SELECT * FROM Posts WHERE thread_id IN (" +
+              threadIds.map(() => "?").join(",") +
+              ")",
+            threadIds,
+            (err, posts) => {
+              if (err) {
+                return res.status(500).json({ error: err.message });
+              }
+              res.json({ threads, posts });
+            }
+          );
+        }
+      );
     }
   );
 });
