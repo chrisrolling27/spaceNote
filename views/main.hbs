@@ -22,7 +22,8 @@
                    id="userId"
                    name="userId"
                    value="1"> <!-- Placeholder userId -->
-            <button type="submit">Post</button>
+            <button type="submit"
+                    id="post-button">Post</button>
         </form>
 
         <div id="postsContainer">
@@ -40,7 +41,7 @@
                         .then(data => {
                             const postsContainer = document.getElementById("postsContainer");
                             if (data.posts.length === 0) {
-                                postsContainer.innerHTML = "<p>No posts available.</p>";
+                                postsContainer.innerHTML = "<p>No posts yet!</p>";
                             } else {
                                 postsContainer.innerHTML = data.posts.map(post => `
                                 <div class="post">
