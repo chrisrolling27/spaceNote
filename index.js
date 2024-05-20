@@ -6,10 +6,6 @@ const db = require("./db/database.js");
 const app = express();
 const PORT = 3000;
 
-app.listen(PORT, () => {
-  console.log(`Server is running on http://localhost:${PORT}`);
-});
-
 app.use(express.static("public"));
 app.use(express.json());
 
@@ -25,7 +21,7 @@ app.get("/", (req, res) => {
   res.render();
 });
 
-// Fetch and display a random space
+// Get random space 
 app.get("/randomspace", async (req, res) => {
   
   async function getRandomSpace() {
@@ -53,7 +49,7 @@ app.get("/randomspace", async (req, res) => {
       message: "success",
       data: {
         space_id: space.space_id,
-        space_name: sanitizedSpaceName,
+        space_name: space.space_name,
         created_at: space.created_at,
       },
     });
@@ -62,7 +58,7 @@ app.get("/randomspace", async (req, res) => {
   }
 });
 
-// Route to go to the requested random space directly
+// Go to a space
 app.get("/:space_name", (req, res) => {
   const spaceName = req.params.space_name;
   db.get(
@@ -84,8 +80,8 @@ app.get("/:space_name", (req, res) => {
   );
 });
 
-// Route to fetch threads and posts
-app.get("/:space_name/threads", (req, res) => {
+// Get a space's posts
+app.get("/:space_name/posts", (req, res) => {
   const spaceName = req.params.space_name;
   db.get(
     "SELECT space_id FROM Spaces WHERE space_name = ?",
@@ -100,32 +96,70 @@ app.get("/:space_name/threads", (req, res) => {
 
       const spaceId = space.space_id;
       db.all(
-        "SELECT * FROM Threads WHERE space_id = ?",
+        "SELECT * FROM Posts WHERE space_id = ?",
         [spaceId],
-        (err, threads) => {
+        (err, posts) => {
           if (err) {
             return res.status(500).json({ error: err.message });
           }
-
-          const threadIds = threads.map((thread) => thread.thread_id);
-          if (threadIds.length === 0) {
-            return res.json({ threads: [], posts: [] });
-          }
-
-          db.all(
-            "SELECT * FROM Posts WHERE thread_id IN (" +
-              threadIds.map(() => "?").join(",") +
-              ")",
-            threadIds,
-            (err, posts) => {
-              if (err) {
-                return res.status(500).json({ error: err.message });
-              }
-              res.json({ threads, posts });
-            }
-          );
+          res.json({ posts });
         }
       );
     }
   );
+});
+
+//Posts to space 
+app.post("/:space_name/posts", async (req, res) => {
+  const spaceName = req.params.space_name;
+  const { longText, userId, imageUrl } = req.body;
+
+  try {
+    const space = await new Promise((resolve, reject) => {
+      db.get(
+        "SELECT space_id FROM Spaces WHERE space_name = ?",
+        [spaceName],
+        (err, row) => {
+          if (err) return reject(err);
+          resolve(row);
+        }
+      );
+    });
+
+    if (!space) {
+      return res.status(404).json({ error: "Space not found" });
+    }
+
+    const spaceId = space.space_id;
+  
+    await new Promise((resolve, reject) => {
+      db.run(
+        "INSERT INTO Posts (space_id, user_id, content, image_url) VALUES (?, ?, ?, ?)",
+        [spaceId, userId, longText, imageUrl],
+        (err) => {
+          if (err) return reject(err);
+          resolve();
+        }
+      );
+    });
+
+    res.json({ message: "Post created successfully" });
+
+  } catch (err) {
+    res.status(500).json({ error: err.message });
+  }
+});
+
+
+
+
+
+
+
+
+
+
+
+app.listen(PORT, () => {
+  console.log(`Server is running on http://localhost:${PORT}`);
 });

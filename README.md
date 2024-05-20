@@ -34,3 +34,9 @@ particular space needs to post route
 
 handle no empty spaces 
 
+
+down and sideways posting
+every post is necessarily in a thread, perhaps the first in a thread
+you can then post reply in a threads which makes it post #2
+
+

@@ -1,53 +1,93 @@
 <!DOCTYPE html>
 <html lang="en">
-<head>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>{{space_name}}</title>
-    <link rel="stylesheet" type="text/css" href="/styles.css" />
-</head>
-<body>
-    <h1>Welcome to {{space_name}}</h1>
-    <form id="spaceForm">
-        <textarea id="longText" name="longText" rows="10" cols="50"></textarea><br />
-        <button type="submit">Post</button>
-    </form>
 
-    <div id="threadsContainer">
-        <!-- Threads will be loaded here -->
-    </div>
+    <head>
+        <meta charset="UTF-8" />
+        <meta name="viewport"
+              content="width=device-width, initial-scale=1.0" />
+        <title>{{space_name}}</title>
+        <link rel="stylesheet"
+              type="text/css"
+              href="/styles.css" />
+    </head>
 
-    <script>
-        document.addEventListener("DOMContentLoaded", function() {
-            const spaceName = "{{space_name}}";
+    <body>
+        <h1>Welcome to {{space_name}}</h1>
+        <form id="spaceForm">
+            <textarea id="longText"
+                      name="longText"
+                      rows="10"
+                      cols="50"></textarea><br />
+            <input type="hidden"
+                   id="userId"
+                   name="userId"
+                   value="1"> <!-- Placeholder userId -->
+            <input type="text"
+                   id="imageUrl"
+                   name="imageUrl"
+                   placeholder="Image URL"><br />
+            <button type="submit">Post</button>
+        </form>
 
-            fetch(`/${spaceName}/threads`)
-                .then(response => response.json())
-                .then(data => {
-                    const threadsContainer = document.getElementById("threadsContainer");
-                    if (data.threads.length === 0) {
-                        threadsContainer.innerHTML = "<p>No threads available.</p>";
-                    } else {
-                        data.threads.forEach(thread => {
-                            const threadElement = document.createElement("div");
-                            threadElement.classList.add("thread");
-                            threadElement.innerHTML = `
-                                <h2>Thread: ${thread.thread_title}</h2>
-                                <div>
-                                    ${data.posts
-                                        .filter(post => post.thread_id === thread.thread_id)
-                                        .map(post => `<p>${post.content}</p>`)
-                                        .join('')}
+        <div id="postsContainer">
+            <!-- Posts will be loaded here -->
+        </div>
+
+        <script>
+            document.addEventListener("DOMContentLoaded", function () {
+                const spaceName = "{{space_name}}";
+                const userId = document.getElementById("userId").value;
+
+                function fetchPosts() {
+                    fetch(`/${spaceName}/posts`)
+                        .then(response => response.json())
+                        .then(data => {
+                            const postsContainer = document.getElementById("postsContainer");
+                            if (data.posts.length === 0) {
+                                postsContainer.innerHTML = "<p>No posts available.</p>";
+                            } else {
+                                postsContainer.innerHTML = data.posts.map(post => `
+                                <div class="post">
+                                    <p>${post.content}</p>
+                                    ${post.image_url ? `<img src="${post.image_url}" alt="Post image">` : ''}
                                 </div>
-                            `;
-                            threadsContainer.appendChild(threadElement);
+                            `).join('');
+                            }
+                        })
+                        .catch(error => {
+                            console.error("Error fetching posts:", error);
                         });
-                    }
-                })
-                .catch(error => {
-                    console.error("Error fetching threads:", error);
+                }
+
+                fetchPosts();
+
+                document.getElementById("spaceForm").addEventListener("submit", function (event) {
+                    event.preventDefault();
+                    const longText = document.getElementById("longText").value;
+                    const imageUrl = document.getElementById("imageUrl").value;
+
+                    fetch(`/${spaceName}/posts`, {
+                        method: "POST",
+                        headers: {
+                            "Content-Type": "application/json"
+                        },
+                        body: JSON.stringify({longText, userId, imageUrl})
+                    })
+                        .then(response => response.json())
+                        .then(data => {
+                            if (data.message === "Post created successfully") {
+                                fetchPosts(); // Refresh the posts after successful submission
+                                document.getElementById("spaceForm").reset();
+                            } else {
+                                console.error("Error posting:", data.error);
+                            }
+                        })
+                        .catch(error => {
+                            console.error("Error posting:", error);
+                        });
                 });
-        });
-    </script>
-</body>
+            });
+        </script>
+    </body>
+
 </html>
