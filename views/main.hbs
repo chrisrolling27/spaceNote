@@ -22,10 +22,6 @@
                    id="userId"
                    name="userId"
                    value="1"> <!-- Placeholder userId -->
-            <input type="text"
-                   id="imageUrl"
-                   name="imageUrl"
-                   placeholder="Image URL"><br />
             <button type="submit">Post</button>
         </form>
 
@@ -49,7 +45,6 @@
                                 postsContainer.innerHTML = data.posts.map(post => `
                                 <div class="post">
                                     <p>${post.content}</p>
-                                    ${post.image_url ? `<img src="${post.image_url}" alt="Post image">` : ''}
                                 </div>
                             `).join('');
                             }
@@ -61,17 +56,23 @@
 
                 fetchPosts();
 
+                document.getElementById("longText").addEventListener("keydown", function (event) {
+                    if (event.key === "Enter" && !event.shiftKey) {
+                        event.preventDefault();
+                        document.getElementById("spaceForm").dispatchEvent(new Event("submit"));
+                    }
+                });
+
                 document.getElementById("spaceForm").addEventListener("submit", function (event) {
                     event.preventDefault();
                     const longText = document.getElementById("longText").value;
-                    const imageUrl = document.getElementById("imageUrl").value;
 
                     fetch(`/${spaceName}/posts`, {
                         method: "POST",
                         headers: {
                             "Content-Type": "application/json"
                         },
-                        body: JSON.stringify({longText, userId, imageUrl})
+                        body: JSON.stringify({longText, userId})
                     })
                         .then(response => response.json())
                         .then(data => {
