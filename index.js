@@ -6,11 +6,12 @@ const dotenv = require('dotenv');
 dotenv.config();
 
 const app = express();
-const PORT = 3000;
+const PORT = process.env.PORT || 3000; 
 const apiKey = process.env.chriskey;
 
 app.use(express.static("public"));
 app.use(express.json());
+app.use('/favicon.ico', express.static(path.join(__dirname, 'public/images/favicon.ico')));
 
 app.engine(
   "hbs",
@@ -19,11 +20,10 @@ app.engine(
 app.set("view engine", "hbs");
 app.set("views", path.join(__dirname, "views"));
 
-
-// Serves main page
-app.get("/", (req, res) => {
-  res.render();
+app.get('/', (req, res) => {
+  res.sendFile(path.join(__dirname, 'public/index.html'));
 });
+
 
 // Get random space 
 app.get("/randomspace", async (req, res) => {
