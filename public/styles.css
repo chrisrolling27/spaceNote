@@ -110,10 +110,33 @@ textarea#longText {
   max-width: 100%;
   box-sizing: border-box;
   padding: 10px;
-  font-size: 16px;
+  font-size: 14px;
   border: 1px solid #ccc;
   border-radius: 4px;
   resize: vertical;
+  height: 75px;
+}
+
+#chatContainer {
+  max-height: 60vh;
+  /* Adjust height to fit within viewport */
+  height: 60vh;
+  /* Ensure it doesn't exceed viewport */
+  overflow-y: auto;
+  display: flex;
+  flex-direction: column-reverse;
+  /* Newest posts at the bottom */
+  border: 1px solid #ccc;
+  padding: 10px;
+  border-radius: 5px;
+  background: #fff;
+}
+
+#postsContainer {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  overflow-y: auto;
 }
 
 /* Media Queries for Responsiveness */
@@ -144,5 +167,11 @@ textarea#longText {
   #post-button {
     padding: 10px 20px;
     font-size: 14px;
+  }
+
+  #chatContainer {
+    max-height: 40vh;
+    /* Adjust for smaller screens */
+    height: 40vh;
   }
 }

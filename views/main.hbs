@@ -9,11 +9,9 @@
         <link rel="stylesheet"
               type="text/css"
               href="/styles.css" />
-            <link rel="icon"
+        <link rel="icon"
               href="/images/favicon.ico?"
               type="image/x-icon" />
-    </head>
-
     </head>
 
     <body>
@@ -31,8 +29,10 @@
                     id="post-button">Post</button>
         </form>
 
-        <div id="postsContainer">
-            <!-- Posts will be loaded here -->
+        <div id="chatContainer">
+            <div id="postsContainer">
+                <!-- Posts will be loaded here -->
+            </div>
         </div>
 
         <script>
@@ -46,13 +46,14 @@
                         .then(data => {
                             const postsContainer = document.getElementById("postsContainer");
                             if (data.posts.length === 0) {
-                                postsContainer.innerHTML = "<p>No posts yet!</p>";
+                                postsContainer.innerHTML = "<p>No posts here yet!</p>";
                             } else {
                                 postsContainer.innerHTML = data.posts.map(post => `
-                                <div class="post">
-                                    <p>${post.content}</p>
-                                </div>
-                            `).join('');
+                                    <div class="post">
+                                        <p>${post.content}</p>
+                                    </div>
+                                `).join('');
+                                postsContainer.scrollTop = postsContainer.scrollHeight; // Scroll to the bottom
                             }
                         })
                         .catch(error => {
