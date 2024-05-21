@@ -2,9 +2,12 @@ const express = require("express");
 const path = require("path");
 const { engine } = require("express-handlebars");
 const db = require("./db/database.js");
+const dotenv = require('dotenv');
+dotenv.config();
 
 const app = express();
 const PORT = 3000;
+const apiKey = process.env.chriskey;
 
 app.use(express.static("public"));
 app.use(express.json());
@@ -15,6 +18,7 @@ app.engine(
 );
 app.set("view engine", "hbs");
 app.set("views", path.join(__dirname, "views"));
+
 
 // Serves main page
 app.get("/", (req, res) => {
